@@ -50,6 +50,12 @@ Create Table CTPNHAP (
 
 Create Table PXUAT (
   SoPx Char(4) Not Null Primary Key,
+  NgayNhap Datetime Default Getdate(),
+  TenKh Varchar(100) NOT Null,
+);
+
+Create Table CTPXUAT (
+  SoPx Char(4) Not Null Foreign Key References PXUAT(SoPx),
   MaVTu Char(4)  Not Null Foreign Key References VATTU(MaVTu),
   SIXuat Int Not Null Check (SIXuat > 0),
    DgXuat Money Not Null Check (DgXuat > 0),
@@ -58,10 +64,10 @@ Create Table PXUAT (
 Create Table TONKHO (
    NamThang Char(6) Not Null Primary Key,
    MaVTu Char(4)  Not Null Foreign Key References VATTU(MaVTu),
-   SLDau Int Not Null Check (SLDau > 0),
-   TongSLN Int Not Null Check (TongSLN > 0),
-   TongSLX Int Not Null Check (TongSLX > 0),
-   SLCuoi  as SLDau + TongSLN - TongSLX
+   SLDau Int Not Null Check (SLDau >= 0),
+   TongSLN Int Not Null Check (TongSLN >= 0),
+   TongSLX Int Not Null Check (TongSLX >= 0),
+   SLCuoi  as (SLDau+TongSLN-TongSLX)
 );
 
 INSERT INTO NHACC(MaNhaCc,TenNhaCc,DiaChi,DienThoai)
@@ -126,4 +132,43 @@ Values
 	 ('D006','TV29',20),
 	 ('D006','VD01',20);
 
------
+-----CTPNHAP
+INSERT INTO CTPNHAP
+Values
+     ('N001','DD01',8,2500000),
+	 ('N001','DD02',10,3500000),
+	 ('N002','DD01',2,2500000),
+	 ('N002','DD02',5,3500000),
+	 ('N003','VD02',30,2500000),
+	 ('N004','TV14',5,2500000),
+	 ('N004','TV29',12,3500000);
+
+-----PNHAP
+INSERT INTO PXUAT VALUES('X001','01/17/2014',N'Lê Hoàng Anh Tuấn')
+INSERT INTO PXUAT VALUES('X002','01/25/2014',N'Nguyễn Trần Lâm')
+INSERT INTO PXUAT VALUES('X003','01/31/2014',N'Bùi Thị Thu Thủy')
+Go
+
+----CTPXUAT
+INSERT INTO CTPXUAT VALUES('X001','DD01',2 ,35)
+INSERT INTO CTPXUAT VALUES('X002','DD01',1 ,35)
+INSERT INTO CTPXUAT VALUES('X002','DD02', 5,49)
+INSERT INTO CTPXUAT VALUES('X003','DD01', 3,35)
+INSERT INTO CTPXUAT VALUES('X003','DD02', 2,49)
+INSERT INTO CTPXUAT VALUES('X003','QD02', 10,32.5)
+
+UPDATE  CTPXUAT SET CTPXUAT.DgXuat=CTPXUAT.DgXuat*100000
+Go
+
+-----TONKHO
+INSERT INTO TONKHO(NamThang,MaVTu,SLDau,TongSLN,TongSLX) VALUES('201401','DD01',0,10,6 )
+INSERT INTO TONKHO(NamThang,MaVTu,SLDau,TongSLN,TongSLX) VALUES('201402','DD02',0,15,7 )
+INSERT INTO TONKHO(NamThang,MaVTu,SLDau,TongSLN,TongSLX) VALUES('201403','QD02',0,30,10 )
+INSERT INTO TONKHO(NamThang,MaVTu,SLDau,TongSLN,TongSLX) VALUES('201404','DD01',4,0,0 )
+INSERT INTO TONKHO(NamThang,MaVTu,SLDau,TongSLN,TongSLX) VALUES('201405','DD02',8,0,0 )
+INSERT INTO TONKHO(NamThang,MaVTu,SLDau,TongSLN,TongSLX) VALUES('201406','QD02',20,0,0 )
+INSERT INTO TONKHO(NamThang,MaVTu,SLDau,TongSLN,TongSLX) VALUES('201407','TV40',5,0,0 )
+INSERT INTO TONKHO(NamThang,MaVTu,SLDau,TongSLN,TongSLX) VALUES('201408','TV32',12,0,0 )
+
+
+----Select * from TONKHO
